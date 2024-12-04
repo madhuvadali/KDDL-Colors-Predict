@@ -1,3 +1,4 @@
+import os  # Ensure this is at the top of your file
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
