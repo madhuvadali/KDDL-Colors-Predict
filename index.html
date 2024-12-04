@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RGB Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        input, button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .output {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .color-box {
+            width: 100px;
+            height: 100px;
+            margin: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Predict RGB Values</h2>
+        <label for="power">Power (W):</label>
+        <input type="number" id="power" placeholder="Enter power value (e.g., 300)" required>
+        
+        <label for="scanSpeed">Scan Speed (mm/s):</label>
+        <input type="number" id="scanSpeed" placeholder="Enter scan speed (e.g., 50)" required>
+        
+        <button onclick="predictRGB()">Predict RGB</button>
+        
+        <div class="output">
+            <h3>Predicted RGB:</h3>
+            <p id="rgbOutput">(R, G, B)</p>
+            <div class="color-box" id="colorBox"></div>
+        </div>
+    </div>
+
+    <script>
+        async function predictRGB() {
+            const power = document.getElementById('power').value;
+            const scanSpeed = document.getElementById('scanSpeed').value;
+
+            if (!power || !scanSpeed) {
+                alert('Please fill in both fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ power: parseInt(power), scanSpeed: parseInt(scanSpeed) }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch prediction.');
+                }
+
+                const data = await response.json();
+                const rgb = data.rgb;
+
+                document.getElementById('rgbOutput').textContent = `(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                document.getElementById('colorBox').style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            } catch (error) {
+                alert('Error predicting RGB value: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
